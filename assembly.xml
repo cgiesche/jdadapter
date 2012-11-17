@@ -1,28 +1,37 @@
-<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
-  <id>Release Package</id>
+	<id>Release Package</id>
 
-  <formats>
-    <format>zip</format>
-  </formats>
+	<formats>
+		<format>zip</format>
+	</formats>
 
-  <includeBaseDirectory>true</includeBaseDirectory>
+	<includeBaseDirectory>true</includeBaseDirectory>
 
-  <baseDirectory>JdAdapter ${project.version}</baseDirectory>
+	<baseDirectory>JdAdapter ${project.version}</baseDirectory>
 
-  <fileSets>
-    <fileSet>
-      <directory>src/main/bin</directory>
-      <outputDirectory>/</outputDirectory>
-    </fileSet>
-  </fileSets>
+	<fileSets>
+		<fileSet>
+			<directory>src/main/bin</directory>
+			<outputDirectory>/</outputDirectory>
+		</fileSet>
+	</fileSets>
 
-  <files>
-    <file>
-      <source>target/${project.build.finalName}.war</source>
-      <destName>JdAdapter.war</destName>
-    </file>
-  </files>
+	<dependencySets>
+		<dependencySet>
+			<includes>
+				<include>org.jvnet.hudson.winstone:winstone</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
+
+	<files>
+		<file>
+			<source>target/${project.build.finalName}.war</source>
+			<destName>JdAdapter.war</destName>
+		</file>
+	</files>
 </assembly>
