@@ -4,7 +4,7 @@
 
 	<groupId>de.perdoctus.synology.jdadapter</groupId>
 	<artifactId>JdAdapter</artifactId>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.4.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 
 	<name>JdAdapter Web App</name>
@@ -94,4 +94,8 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<scm>
+		<developerConnection>scm:git:ssh://git@perdoctus.de/~/jdadapter.git</developerConnection>
+	</scm>
 </project>
