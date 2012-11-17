@@ -3,7 +3,7 @@ INFORMATION
 Homepage:
 http://www.perdoctus.de/synology-downloadstation-with-jdownloader-clicknload/
 
-Board:
+Board (installation instructions included):
 http://forum.perdoctus.de/viewforum.php?f=1
 
 
