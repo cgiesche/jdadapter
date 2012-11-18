@@ -1,9 +1,5 @@
 package de.perdoctus.synology.jdadapter.controller;
 
-import de.perdoctus.synolib.DownloadRedirectorClient;
-import de.perdoctus.synolib.exceptions.LoginException;
-import de.perdoctus.synolib.exceptions.SynoException;
-import de.perdoctus.synology.jdadapter.utils.Decrypter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -24,6 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import de.perdoctus.synolib.DownloadRedirectorClient;
+import de.perdoctus.synolib.exceptions.LoginException;
+import de.perdoctus.synolib.exceptions.SynoException;
+import de.perdoctus.synology.jdadapter.utils.Decrypter;
 
 /**
  *
@@ -70,6 +72,7 @@ public class JdAdapter {
     }
     
     public void handleClassicRequest(String jk, String crypted, String source, HttpServletResponse resp) throws IOException {
+    	log.debug("Configuration: " + drClient.toString());
     	try {
             ScriptEngineManager mgr = new ScriptEngineManager();
             ScriptEngine engine = mgr.getEngineByMimeType("text/javascript");
