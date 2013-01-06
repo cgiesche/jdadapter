@@ -1,8 +1,8 @@
 #!/bin/sh
 
 ############################### S E T T I N G S ###############################
-username=[username]
-password=[password]
+username=username
+password=password
 synoUri=http://192.168.178.30:5000/download/download_redirector.cgi
 ###############################################################################
 
