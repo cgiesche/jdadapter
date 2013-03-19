@@ -95,6 +95,6 @@
 	</build>
 
 	<scm>
-		<developerConnection>scm:git:ssh://git@perdoctus.de/~/jdadapter.git</developerConnection>
+		<developerConnection>scm:git:ssh://git@perdoctus.de/opt/git/jdadapter.git</developerConnection>
 	</scm>
 </project>
