@@ -76,7 +76,7 @@ public class JdAdapter {
 	public void allowCrossdomain(HttpServletResponse resp) throws IOException {
 		OutputStream response = resp.getOutputStream();
 		InputStream input = getClass().getResourceAsStream("/crossdomain.xml");
-		StreamUtils.copy(input, response);
+		StreamUtils.copyThenClose(input, response);
 	}
 
 	@RequestMapping(value = "/flash", method = RequestMethod.GET)
