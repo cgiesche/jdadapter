@@ -24,8 +24,13 @@
 	<artifactId>jdadapter</artifactId>
 	<version>0.4.3-SNAPSHOT</version>
 	<packaging>war</packaging>
-
 	<name>JdAdapter Web App</name>
+
+    <parent>
+        <groupId>de.perdoctus</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0.2</version>
+    </parent>
 
 	<properties>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -114,6 +119,22 @@
 	</build>
 
 	<scm>
-		<developerConnection>scm:git:ssh://git@perdoctus.de/opt/git/jdadapter.git</developerConnection>
+        <connection>https://github.com/cgiesche/jdadapter.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com:cgiesche/jdadapter.git</developerConnection>
 	</scm>
+
+    <repositories>
+        <repository>
+            <name>Perdoctus Repo</name>
+            <id>perdoctus-repo</id>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <url>http://nexus.perdoctus.de/content/groups/perdoctus/</url>
+        </repository>
+    </repositories>
+
 </project>
