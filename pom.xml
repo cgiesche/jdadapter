@@ -67,7 +67,7 @@
         <dependency>
             <groupId>de.perdoctus</groupId>
             <artifactId>synolib</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
 
 		<dependency>
@@ -120,7 +120,7 @@
 
 	<scm>
         <connection>https://github.com/cgiesche/jdadapter.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com:cgiesche/jdadapter.git</developerConnection>
+		<developerConnection>scm:git:ssh://git@github.com/cgiesche/jdadapter.git</developerConnection>
 	</scm>
 
     <repositories>
