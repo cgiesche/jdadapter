@@ -14,7 +14,7 @@
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with jdadapter.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with jdadapter.  If not, see <http://www.gnu.org/licenses />.
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -22,7 +22,7 @@
 
 	<groupId>de.perdoctus</groupId>
 	<artifactId>jdadapter</artifactId>
-	<version>0.4.3-SNAPSHOT</version>
+	<version>0.4.3</version>
 	<packaging>war</packaging>
 	<name>JdAdapter Web App</name>
 
@@ -121,7 +121,8 @@
 	<scm>
         <connection>https://github.com/cgiesche/jdadapter.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/cgiesche/jdadapter.git</developerConnection>
-	</scm>
+	  <tag>jdadapter-0.4.3</tag>
+  </scm>
 
     <repositories>
         <repository>
