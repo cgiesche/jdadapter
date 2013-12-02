@@ -19,24 +19,10 @@
 
 package de.perdoctus.synology.jdadapter.controller;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.PathParam;
-
+import de.perdoctus.synolib.DownloadRedirectorClient;
+import de.perdoctus.synolib.exceptions.LoginException;
+import de.perdoctus.synolib.exceptions.SynoException;
+import de.perdoctus.synology.jdadapter.utils.Decrypter;
 import org.apache.log4j.Logger;
 import org.apache.log4j.lf5.util.StreamUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +30,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import de.perdoctus.synolib.DownloadRedirectorClient;
-import de.perdoctus.synolib.exceptions.LoginException;
-import de.perdoctus.synolib.exceptions.SynoException;
-import de.perdoctus.synology.jdadapter.utils.Decrypter;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.PathParam;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Christoph Giesche
@@ -55,115 +52,90 @@ import de.perdoctus.synology.jdadapter.utils.Decrypter;
 @Controller
 public class JdAdapter {
 
-	private final Logger log = Logger.getLogger(getClass());
-	private Map<String, String> uriReplacementList = new HashMap<String, String>();
+	private static final Logger LOG = Logger.getLogger(JdAdapter.class);
+	private static final Map<String, String> URI_REPLACEMENT_LIST = new HashMap<String, String>();
 
 	{
-		uriReplacementList.put("^http://share-online.biz/dl/", "http://www.share-online.biz/dl/");
+		URI_REPLACEMENT_LIST.put("^http://share-online.biz/dl/", "http://www.share-online.biz/dl/");
 	}
 
 	@Autowired
 	private DownloadRedirectorClient drClient;
 
 	@RequestMapping(value = "/jdcheck.js", method = RequestMethod.GET)
-	public void returnJdScript(HttpServletResponse resp) throws IOException {
-		log.info("Got Request from 'classic' click'n'load button.");
+	public void returnJdScript(final HttpServletResponse resp) throws IOException {
+		LOG.info("Got Request from 'classic' click'n'load button.");
 		resp.setStatus(200);
 		resp.getWriter().println("jdownloader=true");
 	}
 
 	@RequestMapping(value = "/crossdomain.xml", method = RequestMethod.GET)
-	public void allowCrossdomain(HttpServletResponse resp) throws IOException {
-		OutputStream response = resp.getOutputStream();
-		InputStream input = getClass().getResourceAsStream("/crossdomain.xml");
+	public void allowCrossdomain(final HttpServletResponse resp) throws IOException {
+		final OutputStream response = resp.getOutputStream();
+		final InputStream input = getClass().getResourceAsStream("/crossdomain.xml");
 		StreamUtils.copyThenClose(input, response);
 	}
 
 	@RequestMapping(value = "/flash", method = RequestMethod.GET)
-	public void enableFlashButton(HttpServletResponse resp) throws IOException {
-		log.info("Got Request from flash click'n'load button.");
+	public void enableFlashButton(final HttpServletResponse resp) throws IOException {
+		LOG.info("Got Request from flash click'n'load button.");
 		resp.setStatus(HttpServletResponse.SC_OK);
 		resp.getWriter().print("JDownloader");
 	}
 
 	@RequestMapping(value = "/flash/addcrypted2", method = RequestMethod.POST)
-	public void addDownloads(@FormParam("jk") String jk, @FormParam("crypted") String crypted, @PathParam("source") String source, @PathParam("jd") String jd, HttpServletResponse resp) throws IOException {
-		log.info("Got download request! (Assuming NON-DLC.)");
-		handleClassicRequest(jk, crypted, source, resp);
-		log.info("Finished.");
+	public void addDownloads(@FormParam("jk") final String jk, @FormParam("crypted") final String crypted, @PathParam("source") final String source, @PathParam("jd") final String jd, final HttpServletResponse resp) throws IOException {
+		LOG.info("Got download request! (Assuming NON-DLC.)");
+		handleClassicRequest(jk, crypted, resp);
+		LOG.info("Finished.");
 	}
 
-	public void handleDlcRequest(@FormParam("jk") String jk, @FormParam("crypted") String crypted, @PathParam("source") String source, @PathParam("jd") String jd, HttpServletResponse resp) throws IOException {
-		resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Das gibts noch nicht!");
-	}
+	public void handleClassicRequest(final String jk, final String crypted, final HttpServletResponse resp) throws IOException {
+		LOG.debug("Configuration: " + drClient.toString());
 
-	public void handleClassicRequest(String jk, String crypted, String source, HttpServletResponse resp) throws IOException {
-		log.debug("Configuration: " + drClient.toString());
 		try {
-			ScriptEngineManager mgr = new ScriptEngineManager();
-			ScriptEngine engine = mgr.getEngineByMimeType("text/javascript");
-			engine.eval(jk + "\nvar result = f();");
-			String key = engine.get("result").toString();
+			final String key = extractKey(jk);
+			final List<URI> targets = Decrypter.decryptDownloadUri(crypted, key);
+			final List<URI> fixedTargets = fixURIs(targets);
 
-			List<URI> targets;
-			try {
-				log.debug("Decrypting URLs.");
-				targets = Decrypter.decryptDownloadUri(crypted, key);
-				log.debug("Finished. Number of URIs: " + targets.size());
-				log.debug("Fixing URIs.");
-				targets = fixURIs(targets);
-			} catch (URISyntaxException ex) {
-				log.error("Decryped URL seems to be corrupt.", ex);
-				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-				return;
+			LOG.debug("Sending download URLs to Synology NAS. Number of URIs: " + targets.size());
+			for (URI target : fixedTargets) {
+				drClient.addDownloadUrl(target);
 			}
-
-			try {
-				for (URI target : targets) {
-					log.debug("Adding URLs to Synology Download Station.");
-					drClient.addDownloadUrl(target);
-					log.debug("Done.");
-				}
-			} catch (SynoException ex) {
-				log.error(ex.getMessage(), ex);
-				if (ex instanceof LoginException) {
-					resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
-					return;
-				} else {
-					resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-					return;
-				}
-			}
-
 			resp.setStatus(HttpServletResponse.SC_OK);
-			resp.getWriter().print("Sucessfully added " + targets.size() + " downloads to Synology NAS.");
 
 		} catch (ScriptException ex) {
-			log.error(ex.getMessage(), ex);
+			LOG.error(ex.getMessage(), ex);
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Failed to evaluate script:\n" + ex.getMessage());
-		} catch (MalformedURLException ex) {
-			log.error(ex.getMessage(), ex);
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Encrypted data contains invalid URL.\n" + ex.getMessage());
+		} catch (SynoException ex) {
+			LOG.error(ex.getMessage(), ex);
+			if (ex instanceof LoginException) {
+				resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
+			} else {
+				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+			}
+		} catch (URISyntaxException ex) {
+			LOG.error("Decrypted URL seems to be corrupt.", ex);
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
 		}
 	}
 
-	private List<URI> fixURIs(final List<URI> srcURIs) {
+	private String extractKey(String jk) throws ScriptException {
+		final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+		final ScriptEngine scriptEngine = scriptEngineManager.getEngineByMimeType("text/javascript");
+		scriptEngine.eval(jk + "\nvar result = f();");
+		return scriptEngine.get("result").toString();
+	}
+
+	private List<URI> fixURIs(final List<URI> srcURIs) throws URISyntaxException {
 		final List<URI> resultURIs = new ArrayList<URI>(srcURIs.size());
 		for (final URI srcURI : srcURIs) {
 			String srcURIStr = srcURI.toASCIIString();
-			for (final String findPattern : uriReplacementList.keySet()) {
-				srcURIStr = srcURIStr.replaceAll(findPattern, uriReplacementList.get(findPattern));
+			for (final String findPattern : URI_REPLACEMENT_LIST.keySet()) {
+				srcURIStr = srcURIStr.replaceAll(findPattern, URI_REPLACEMENT_LIST.get(findPattern));
 			}
-			resultURIs.add(URI.create(srcURIStr));
+			resultURIs.add(new URI(srcURIStr));
 		}
 		return resultURIs;
-	}
-
-	public DownloadRedirectorClient getClient() {
-		return drClient;
-	}
-
-	public void setClient(DownloadRedirectorClient client) {
-		this.drClient = client;
 	}
 }
