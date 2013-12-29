@@ -22,7 +22,7 @@
 
 	<groupId>de.perdoctus</groupId>
 	<artifactId>jdadapter</artifactId>
-	<version>0.4.4-SNAPSHOT</version>
+	<version>0.4.4</version>
 	<packaging>war</packaging>
 	<name>JdAdapter Web App</name>
 
@@ -121,7 +121,7 @@
 	<scm>
         <connection>https://github.com/cgiesche/jdadapter.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/cgiesche/jdadapter.git</developerConnection>
-	  <tag>HEAD</tag>
+	  <tag>jdadapter-0.4.4</tag>
   </scm>
 
     <repositories>
