@@ -57,6 +57,8 @@ public class JdAdapter {
 
 	{
 		URI_REPLACEMENT_LIST.put("^http://share-online.biz/dl/", "http://www.share-online.biz/dl/");
+		URI_REPLACEMENT_LIST.put("^http://share-online.biz/download.php\\?id=", "http://www.share-online.biz/dl/");
+		URI_REPLACEMENT_LIST.put("^http://www.share-online.biz/download.php\\?id=", "http://www.share-online.biz/dl/");
 	}
 
 	@Autowired
