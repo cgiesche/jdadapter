@@ -37,4 +37,13 @@
         <property name="username" value="${username}"/>
         <property name="password" value="${password}"/>
     </bean>
+
+    <bean id="analyticsTracker" class="com.dmurph.tracking.JGoogleAnalyticsTracker">
+        <constructor-arg name="argConfigData">
+            <bean class="com.dmurph.tracking.AnalyticsConfigData">
+                <constructor-arg name="argTrackingCode" value="UA-28651183-5"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="argVersion" value="V_4_7_2"/>
+    </bean>
 </beans>

@@ -19,18 +19,17 @@
 
 package de.perdoctus.synology.jdadapter.utils;
 
+import org.apache.log4j.Logger;
+import sun.misc.BASE64Decoder;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.log4j.Logger;
-
-import sun.misc.BASE64Decoder;
 
 /**
  *

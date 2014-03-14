@@ -2,7 +2,7 @@
 
 REM ############################ S E T T I N G S ###################################
 set username=username
-set password=password]
+set password=password
 set synoUri=http://192.168.178.30:5000/download/download_redirector.cgi
 REM ################################################################################
 

@@ -19,6 +19,7 @@
 
 package de.perdoctus.synology.jdadapter.controller;
 
+import com.dmurph.tracking.JGoogleAnalyticsTracker;
 import de.perdoctus.synolib.DownloadRedirectorClient;
 import de.perdoctus.synolib.exceptions.LoginException;
 import de.perdoctus.synolib.exceptions.SynoException;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.annotation.PostConstruct;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -55,7 +57,7 @@ public class JdAdapter {
 	private static final Logger LOG = Logger.getLogger(JdAdapter.class);
 	private static final Map<String, String> URI_REPLACEMENT_LIST = new HashMap<String, String>();
 
-	{
+	static {
 		URI_REPLACEMENT_LIST.put("^http://share-online.biz/dl/", "http://www.share-online.biz/dl/");
 		URI_REPLACEMENT_LIST.put("^http://share-online.biz/download.php\\?id=", "http://www.share-online.biz/dl/");
 		URI_REPLACEMENT_LIST.put("^http://www.share-online.biz/download.php\\?id=", "http://www.share-online.biz/dl/");
@@ -63,6 +65,14 @@ public class JdAdapter {
 
 	@Autowired
 	private DownloadRedirectorClient drClient;
+
+	@Autowired
+	private JGoogleAnalyticsTracker analyticsTracker;
+
+	@PostConstruct
+	public void postConstruct() {
+		analyticsTracker.trackEvent("JdAdapter.Main", "Startup Finished");
+	}
 
 	@RequestMapping(value = "/jdcheck.js", method = RequestMethod.GET)
 	public void returnJdScript(final HttpServletResponse resp) throws IOException {
@@ -105,10 +115,12 @@ public class JdAdapter {
 				drClient.addDownloadUrl(target);
 			}
 			resp.setStatus(HttpServletResponse.SC_OK);
+			analyticsTracker.trackEvent("JdAdapter", "Classic Request", "added targets", targets.size());
 
 		} catch (ScriptException ex) {
 			LOG.error(ex.getMessage(), ex);
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Failed to evaluate script:\n" + ex.getMessage());
+
 		} catch (SynoException ex) {
 			LOG.error(ex.getMessage(), ex);
 			if (ex instanceof LoginException) {
@@ -116,6 +128,7 @@ public class JdAdapter {
 			} else {
 				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
 			}
+
 		} catch (URISyntaxException ex) {
 			LOG.error("Decrypted URL seems to be corrupt.", ex);
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
