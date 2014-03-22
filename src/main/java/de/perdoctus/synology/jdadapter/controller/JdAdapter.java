@@ -56,6 +56,7 @@ public class JdAdapter {
 
 	private static final Logger LOG = Logger.getLogger(JdAdapter.class);
 	private static final Map<String, String> URI_REPLACEMENT_LIST = new HashMap<String, String>();
+	private static final String ANALYTICS_EVENT_CATEGORY = "JdAdapter";
 
 	static {
 		URI_REPLACEMENT_LIST.put("^http://share-online.biz/dl/", "http://www.share-online.biz/dl/");
@@ -69,9 +70,12 @@ public class JdAdapter {
 	@Autowired
 	private JGoogleAnalyticsTracker analyticsTracker;
 
+	@Autowired
+	private String appVersion;
+
 	@PostConstruct
 	public void postConstruct() {
-		analyticsTracker.trackEvent("JdAdapter.Main", "Startup Finished");
+		analyticsTracker.trackEvent(ANALYTICS_EVENT_CATEGORY, "Startup Finished", appVersion);
 	}
 
 	@RequestMapping(value = "/jdcheck.js", method = RequestMethod.GET)
@@ -115,7 +119,7 @@ public class JdAdapter {
 				drClient.addDownloadUrl(target);
 			}
 			resp.setStatus(HttpServletResponse.SC_OK);
-			analyticsTracker.trackEvent("JdAdapter", "Classic Request", "added targets", targets.size());
+			analyticsTracker.trackEvent(ANALYTICS_EVENT_CATEGORY, "Classic Request", "added targets", targets.size());
 
 		} catch (ScriptException ex) {
 			LOG.error(ex.getMessage(), ex);

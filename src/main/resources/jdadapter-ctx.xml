@@ -38,6 +38,10 @@
         <property name="password" value="${password}"/>
     </bean>
 
+    <bean id="appVersion" class="java.lang.String">
+        <constructor-arg value="${app.version}"/>
+    </bean>
+
     <bean id="analyticsTracker" class="com.dmurph.tracking.JGoogleAnalyticsTracker">
         <constructor-arg name="argConfigData">
             <bean class="com.dmurph.tracking.AnalyticsConfigData">
