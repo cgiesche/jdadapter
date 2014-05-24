@@ -1,0 +1,4 @@
+* text=auto
+
+# Shell scripts should end with line feed.
+*.sh text eol=lf
